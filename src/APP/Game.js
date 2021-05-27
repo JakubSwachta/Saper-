@@ -167,7 +167,7 @@ class Game extends UI {
 		const colIndex = parseInt(target.getAttribute('data-x'), 10);
 
 		// Mamy tablice dwuwymiarową a w zmiennych  przetrzymujemy lokalizację naszych komórek
-		// na komórce o podnym indeksie wywołąmy metodę revealCell z class Cell
+		//  wywołujemy metodę revealCell z class Cell a komórkę przekazujemy jako parametr
 		const cell = this.#cells[rowIndex][colIndex];
 		this.#clickCell(cell);
 	};
@@ -246,6 +246,27 @@ class Game extends UI {
 
 		cell.value = minesCount;
 		cell.revealCell();
+		/* -----   Odkrywamy pola automatycznie jeśli nie są otoczone miną ------ */
+		// jeśli cell.value równa się zero (czyli negacja) to robimy jeszcze raz pętle w pętli
+		if (!cell.value) {
+			for (
+				let rowIndex = Math.max(cell.y - 1, 0);
+				rowIndex <= Math.min(cell.y + 1, this.#numbersOfRows - 1);
+				rowIndex++
+			) {
+				for (
+					let colIndex = Math.max(cell.x - 1, 0);
+					colIndex <= Math.min(cell.x + 1, this.#numbersOfCols - 1);
+					colIndex++
+				) {
+					const cell = this.#cells[rowIndex][colIndex];
+					// jeślo komórka o podanych indexach nie jest odkryta to wywołujemy metodę clickCell()
+					if (!cell.isReveal) {
+						this.#clickCell(cell);
+					}
+				}
+			}
+		}
 	}
 
 	/* tworzymy metodę która bedzie dopasowywać maksymalną szerokość naszego board z komórkami do ilości komórek w rzedzie */

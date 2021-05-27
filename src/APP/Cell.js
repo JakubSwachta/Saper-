@@ -38,6 +38,9 @@ export class Cell extends UI {
 		}
 		if (this.value) {
 			this.element.textContent = this.value;
+			// console.log(this.value);
+			// dzieki zapisowi this.value dodajemy odpowiednią klasę do naszej komórki
+			this.element.classList.add(`cell-info-${this.value}`);
 		}
 	}
 
