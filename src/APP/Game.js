@@ -76,7 +76,7 @@ class Game extends UI {
 	#endGame(isWin) {
 		this.#isGameFinished = true;
 		this.#timer.stopTimer();
-
+		// jeśli fałsz to odkryj wszystkie miny
 		if (!isWin) {
 			this.#revealMines();
 		}
@@ -144,7 +144,7 @@ class Game extends UI {
 
 			const hasCellMine = cell.isMine;
 			// jeśli nasza komórka cell do której przypisaliśmy poszczególną komórkę za po mocą this.#cells[rowIndex][colIndex];
-			// ma minę -> łaściwość cell.isMine jest false to odpali się metoda addMine która doda nam mine oraz zmniejszy minesToPlace o jeden
+			// nie ma miny -> łaściwość cell.isMine jest false to odpali się metoda addMine która doda nam mine oraz zmniejszy minesToPlace o jeden
 			if (!hasCellMine) {
 				cell.addMine();
 				minesToPlace--;
@@ -202,12 +202,14 @@ class Game extends UI {
 		}
 	};
 	// sprwdzamy czy dana komórka jest miną
+	// funkcja jest wywoływana po kliknięciu w komórkę
 	#clickCell(cell) {
 		if (this.#isGameFinished || cell.isFlagged) return;
 		if (cell.isMine) {
+			// argument false bo przegrywamy
 			this.#endGame(false);
 		}
-		cell.revealCell();
+		this.#setCellValue(cell);
 	}
 	// filtrujemy nasze komórki które są miną
 	// if cell.isMine jest true z metody filter to znaczy żmają minę
@@ -216,6 +218,34 @@ class Game extends UI {
 			.flat()
 			.filter(({ isMine }) => isMine)
 			.forEach((cell) => cell.revealCell());
+	}
+
+	/* -------chcemy zobaczyć ile w sąsiadujących komórkach znajduje sie min -------*/
+	//  w pętli for wykonujemy iteracje ponaszej tablicy dwuwymiarowej, w pierwszej pętli odnajdujemy komórkę o jeden mniejszą od naszej i wykonujemy do o jeden większej
+	// w kolejnej pętli schodzimy do rzędów i tam odnajdujemy o jeden mniejszy od klikniętego i wykonujemy do o jeden większego
+	#setCellValue(cell) {
+		let minesCount = 0;
+		// dla skrajnych komórek nie możemy iść w jedną stronę dlatego używamy funkcji Math
+		// u żywamywamy funkcji Math.max wybieramy największą liczbę z podanych czyli np. miendzy (cell - 1 a 0)
+		// Math.min - this.#numberOfRows to jset 8, cell.y + 1 w przypadku skrajnej komórki nie istnieje
+		// pierwsza pętla bedzie wykonywać się dopóki rowIndex będzię mniejszy bądźrówny wartośći mniejszej z tych dwóch(cell.y + 1 oraz this.#numberOfRows - 1 )
+		for (
+			let rowIndex = Math.max(cell.y - 1, 0);
+			rowIndex <= Math.min(cell.y + 1, this.#numbersOfRows - 1);
+			rowIndex++
+		) {
+			for (
+				let colIndex = Math.max(cell.x - 1, 0);
+				colIndex <= Math.min(cell.x + 1, this.#numbersOfCols - 1);
+				colIndex++
+			) {
+				// jeślo komórka o podanych indexach jest miną to  zwiększamy minesCount o jeden
+				if (this.#cells[rowIndex][colIndex].isMine) minesCount++;
+			}
+		}
+
+		cell.value = minesCount;
+		cell.revealCell();
 	}
 
 	/* tworzymy metodę która bedzie dopasowywać maksymalną szerokość naszego board z komórkami do ilości komórek w rzedzie */

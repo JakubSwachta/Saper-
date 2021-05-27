@@ -34,6 +34,10 @@ export class Cell extends UI {
 		// dodajemy naszą klasę z miną jeśli this.mine is true
 		if (this.isMine) {
 			this.element.classList.add('cell--is-mine');
+			return;
+		}
+		if (this.value) {
+			this.element.textContent = this.value;
 		}
 	}
 
