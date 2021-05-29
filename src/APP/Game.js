@@ -102,6 +102,20 @@ class Game extends UI {
 		});
 	}
 
+	// #removeCellsEventListners() {
+	// 	this.#cellsElements.forEach((element) => {
+	// 		element.removeEventListner('click', this.#handleCellClick);
+	// 		element.removeEventListner('contextmenu', this.#handleCellContextMenu);
+	// 	});
+	// }
+
+	#removeCellsEventListeners() {
+		this.#cellsElements.forEach((element) => {
+			element.removeEventListener('click', this.#handleCellClick);
+			element.removeEventListener('contextmenu', this.#handleCellContextMenu);
+		});
+	}
+
 	/* -------------- !!!!! klikanie przyciskó easy medium expert !!!!!!! ------------- */
 	#addButtonsEventListeners() {
 		this.#buttons.easy.addEventListener('click', () =>
@@ -117,25 +131,20 @@ class Game extends UI {
 	}
 
 	// przycisk restarujący (buźka) zaczynamy od nowa na tym samym poziomie trudności
+	// ustawiamy parametry defaultowe takie które odpalą się po wywołaniu funkcji bez parametrów
 	#handleNewGameClick(rows = this.#numbersOfRows, cols = this.#numbersOfCols, mines = this.#numbersOfMines) {
+		this.#removeCellsEventListeners();
 		this.#newGame(rows, cols, mines);
 	}
 
 	// chwytamy nasz element o atrybucie '[data-board]' poprzez querySelector z metody getElement  (board, element => article) z UI class  bedziemy mogli wkłądać do niego komórki
-	/* #handleElements() {
+	#handleElements() {
 		this.#board = this.getElement(this.UiSelectors.board);
+		/* ----- chwytamy pozostałe przyciski BUŹKA, EASY, NORMAL, EXPERT */
 		// przypisujemy do odpowiedniego property naszego nowo stworzonego obiektu #buttons elementy które chwytamy po atrybucie z classy UI
 		this.#buttons.modal = this.getElement(this.UiSelectors.modalButton);
 		this.#buttons.easy = this.getElement(this.UiSelectors.easyButton);
 		// console.log(this.#buttons.easy);
-		this.#buttons.normal = this.getElement(this.UiSelectors.normalButton);
-		this.#buttons.expert = this.getElement(this.UiSelectors.expertButton);
-	} */
-
-	#handleElements() {
-		this.#board = this.getElement(this.UiSelectors.board);
-		this.#buttons.modal = this.getElement(this.UiSelectors.modalButton);
-		this.#buttons.easy = this.getElement(this.UiSelectors.easyButton);
 		this.#buttons.normal = this.getElement(this.UiSelectors.normalButton);
 		this.#buttons.expert = this.getElement(this.UiSelectors.expertButton);
 	}
@@ -145,6 +154,8 @@ class Game extends UI {
 	// na miejsce w tablicy "this.#cells" o indeksie "row" wrzuć pustą yablicę
 	// mamy tablicę składającą się z 8 pustych tablic(rzędy)
 	#generateCells() {
+		// czyścimy naszą tablicę
+		this.#cells.length = 0;
 		for (let row = 0; row < this.#numbersOfRows; row++) {
 			this.#cells[row] = [];
 			// console.log(this.#cells);
@@ -159,8 +170,16 @@ class Game extends UI {
 	}
 	/* -- metoda która będzie nam tworzyłą elementy które */
 	#renderBoard() {
+		// console.log(this.#board.firstChild.nodeName);
+		// console.log(this.#board.innerHTML);
+		/* -- PROBLEM */
+		// cały czas po klikaniu w przyciski poziomu trudności dodają się nowe komórki do naszej tablicy ???
+		// this.#board.innerHTML = ''
+		while (this.#board.firstChild) {
+			this.#board.removeChild(this.#board.firstChild);
+		}
 		// spłaszcamy, tweorzymy tablicę jedno wymiarową i dla każdego jej elementu
-		/*---  do anszego #board() "element chwycony za pomocą atrybutu '[data-board]' [czyli nasza plansza article]"
+		/*---  do anszego #board() "element chwycony za pomocą atrybutu '[data-board]' [czyli nasza plansza article] w funkcji handleElements"
        dodajemy jako ostatnie dziecko metodę createElement(którą wywołujemy na obiekcie cell czyli naszym elemencie z for each) z Cells.js która zraca nam const element z nasszym divem  ---*/
 		// każdemu property element w każdym obiekcie cell  zostaje przpisane po znaku = document.querySelector(selector) poprzez wywołąnie metody createElement() na obiekcie cell z UI.js
 		// selektorem w typ wypadku jest cell.selector property które ma wartosć `[data-x="${this.x}"][data-y="${this.y}"]`
@@ -170,6 +189,7 @@ class Game extends UI {
 			cell.element = cell.getElement(cell.selector);
 			// console.log(cell);
 		});
+		// console.log(this.#board);
 	}
 
 	// tworzymy metode odpoowiedzialną za rozmieszczenie min
