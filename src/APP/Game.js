@@ -2,6 +2,7 @@ import { Cell } from './Cell.js';
 import { UI } from './UI.js';
 import { Counter } from './Counter.js';
 import { Timer } from './Timer.js';
+import { ResetButton } from './ResetButton.js';
 
 // extends - rozszerzamy naszą klasę o wszystkie metody z UI
 class Game extends UI {
@@ -12,7 +13,7 @@ class Game extends UI {
 			cols: 8,
 			mines: 10,
 		},
-		medium: {
+		normal: {
 			rows: 16,
 			cols: 16,
 			mines: 40,
@@ -41,6 +42,13 @@ class Game extends UI {
 
 	/* metoda do chwytania naszych elementów  */
 	#board = null;
+	#buttons = {
+		modall: null,
+		easy: null,
+		normal: null,
+		expert: null,
+		reset: new ResetButton(),
+	};
 
 	/*---- podczas ładowania okna przeglądarki odpalana jest metoda initializeGame która odpala dwie kolejne metody   ----*/
 	// odpala metoidy #handleElements() i #newGame()
@@ -51,6 +59,8 @@ class Game extends UI {
 		this.#counter.init();
 		// inicjujemy Timer
 		this.#timer.init();
+		this.#addButtonsEventListeners();
+
 		this.#newGame();
 	}
 	/* --- Domyślnie jeśli urzytkownik uruchomi sobie kartę przeglądarki to pokazujemy poziom łątwy ---- */
@@ -92,9 +102,42 @@ class Game extends UI {
 		});
 	}
 
+	/* -------------- !!!!! klikanie przyciskó easy medium expert !!!!!!! ------------- */
+	#addButtonsEventListeners() {
+		this.#buttons.easy.addEventListener('click', () =>
+			this.#handleNewGameClick(this.#config.easy.rows, this.#config.easy.cols, this.#config.easy.mines)
+		);
+		this.#buttons.normal.addEventListener('click', () =>
+			this.#handleNewGameClick(this.#config.normal.rows, this.#config.normal.cols, this.#config.normal.mines)
+		);
+		this.#buttons.expert.addEventListener('click', () =>
+			this.#handleNewGameClick(this.#config.expert.rows, this.#config.expert.cols, this.#config.expert.mines)
+		);
+		this.#buttons.reset.element.addEventListener('click', () => this.#handleNewGameClick());
+	}
+
+	// przycisk restarujący (buźka) zaczynamy od nowa na tym samym poziomie trudności
+	#handleNewGameClick(rows = this.#numbersOfRows, cols = this.#numbersOfCols, mines = this.#numbersOfMines) {
+		this.#newGame(rows, cols, mines);
+	}
+
 	// chwytamy nasz element o atrybucie '[data-board]' poprzez querySelector z metody getElement  (board, element => article) z UI class  bedziemy mogli wkłądać do niego komórki
+	/* #handleElements() {
+		this.#board = this.getElement(this.UiSelectors.board);
+		// przypisujemy do odpowiedniego property naszego nowo stworzonego obiektu #buttons elementy które chwytamy po atrybucie z classy UI
+		this.#buttons.modal = this.getElement(this.UiSelectors.modalButton);
+		this.#buttons.easy = this.getElement(this.UiSelectors.easyButton);
+		// console.log(this.#buttons.easy);
+		this.#buttons.normal = this.getElement(this.UiSelectors.normalButton);
+		this.#buttons.expert = this.getElement(this.UiSelectors.expertButton);
+	} */
+
 	#handleElements() {
 		this.#board = this.getElement(this.UiSelectors.board);
+		this.#buttons.modal = this.getElement(this.UiSelectors.modalButton);
+		this.#buttons.easy = this.getElement(this.UiSelectors.easyButton);
+		this.#buttons.normal = this.getElement(this.UiSelectors.normalButton);
+		this.#buttons.expert = this.getElement(this.UiSelectors.expertButton);
 	}
 
 	/* w pętli tworzymy nasze komórki */
