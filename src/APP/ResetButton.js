@@ -9,6 +9,6 @@ export class ResetButton extends UI {
 		// wewnątrz naszego buttona chcemy wybrać element use
 		// i będziemly chcieli zmieniać atrybut href(naszą minkę)
 		// metoda setAttribute ustawia nową wartość dla atrybutu
-		this.element.querySelector('use').setAttribute('href', `./assets/sprite.svg#${emotion}`);
+		this.element.querySelector('use').setAttribute('href', `/src/assets/sprite.svg#${emotion}`);
 	}
 }
